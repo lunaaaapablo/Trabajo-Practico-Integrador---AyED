@@ -26,14 +26,16 @@ public class GrafoMaterias {
         return -1;
     }
 
-    public void agregarCorrelativa(int idOrigen, int idDestino) {
-        int i = buscarIndicePorId(idOrigen);
+    public void  agregarCorrelativa(int idOrigen, int idDestino, int valor){
+        int i  = buscarIndicePorId(idOrigen);
         int j = buscarIndicePorId(idDestino);
+
         if (i == -1 || j == -1) {
-            System.err.println("Id no encontrado: " + idOrigen + " → " + idDestino);
+            System.err.println("Error: Materia no encontrada (idOrigen: " + idOrigen + ", idDestino: " + idDestino + ")");
             return;
         }
-        grafo.getMatrizCosto().actualizar(1.0, i, j);
+
+        grafo.getMatrizCosto().actualizar((double) valor, i, j);
     }
 
     public Materia getMateria(int indice) {
@@ -42,5 +44,9 @@ public class GrafoMaterias {
 
     public GrafoDirigido getGrafo()         { return grafo; }
     public ListaDoubleLinkedL getMaterias() { return materias; }
+
+    public int getCapacidad() {
+        return materias.tamanio();
+    }
 }
 
