@@ -1,6 +1,7 @@
 1;Elementos de Programación;1
-2;Matemáticas para Informática;1	
+2;Matemáticas para Informática;1
 3;Análisis Matemático I;1	
 4;Algebra Lineal y Geometría Analítica;1	
 5;Programación;1	
 6;Sistema de Computación;2
+7;Algoritmos y Estructuras de Datos;2
