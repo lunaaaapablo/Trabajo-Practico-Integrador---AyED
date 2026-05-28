@@ -2,6 +2,9 @@ package reglass;
 
 import grafo.GrafoMaterias;
 import modelo.Alumno;
+//clase principal de las reglas, que se encarga de analizar la solicitud de un alumno para cursar una materia,
+//  aplicando las reglas en orden y 
+// devolviendo un dictamen final
 
 public class MotorReglas {
     private GrafoMaterias grafoMaterias;
@@ -13,7 +16,7 @@ public class MotorReglas {
     public Dictamen analizar(Alumno alumno, int idMateria) {
         int indiceMateria = grafoMaterias.buscarIndicePorId(idMateria);
         if (indiceMateria == -1) {
-            return new Dictamen(false, "Materia no encontrada en el plan de estudios");
+            return new Dictamen(false, "Materia no encontrada en el plan de estudios");// Si la materia no existe, no se puede aprobar
         }
 
         // Regla 1: todas las correlativas regulares cumplidas
