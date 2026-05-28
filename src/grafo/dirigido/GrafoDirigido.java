@@ -22,10 +22,10 @@ public class GrafoDirigido extends AbsGrafoD{
 					if (currCost!=-1){
 						this.getMatrizCosto().actualizar(currCost, i, j);	
 					}else{
-						this.getMatrizCosto().actualizar(infinito, i, j);
+						this.getMatrizCosto().actualizar(getInfinito(), i, j);
 					}					
 				}else{
-					this.getMatrizCosto().actualizar(infinito, i, j);
+					this.getMatrizCosto().actualizar(getInfinito(), i, j);
 				}
 			}
 		} 
@@ -39,7 +39,7 @@ public class GrafoDirigido extends AbsGrafoD{
 		for(int j = 0;j < getOrden();j++){
 
 	        if((double)
-	            getMatrizCosto().devolver(v,j)!= infinito){
+	            getMatrizCosto().devolver(v,j)!= getInfinito()){
 	        	grado++;
 	        }
 	    }
@@ -51,7 +51,7 @@ public class GrafoDirigido extends AbsGrafoD{
 	    int grado = 0;
 
 	    for(int i = 0;i < getOrden();i++){
-	        if((double)getMatrizCosto().devolver(i,v) != infinito){
+	        if((double)getMatrizCosto().devolver(i,v) != getInfinito()){
 	        	grado++;
 	        }
 	    }
@@ -64,7 +64,7 @@ public class GrafoDirigido extends AbsGrafoD{
 
 	    for(int j = 0; j < getOrden(); j++){//recorro filas
 
-	        if((double)getMatrizCosto().devolver(v,j)!= infinito){//si hay conexion 
+	        if((double)getMatrizCosto().devolver(v,j)!= getInfinito()){//si hay conexion 
 	            
 	        	Connection c = new Connection(v,j,(double)getMatrizCosto().devolver(v,j));
 	            arcos.meter(c);
@@ -80,7 +80,7 @@ public class GrafoDirigido extends AbsGrafoD{
 
 	            if((double)
 	                getMatrizCosto().devolver(i,j)
-	                != infinito){
+	                != getInfinito()){
 
 	                Connection c = new Connection(i,j, (double)
 	                        getMatrizCosto().devolver(i,j));
@@ -120,7 +120,7 @@ public class GrafoDirigido extends AbsGrafoD{
 		recursion.reemplazar(true,v);
 		//recorrer vecinos
 		for(int j = 0; j < getOrden();j++) {
-			if((double)getMatrizCosto().devolver(v, j) != infinito) {
+			if((double)getMatrizCosto().devolver(v, j) != getInfinito()) {
 				//si hay arco --> obtener marcas
 				boolean marcado = (boolean)visitado.devolver(j);
 				boolean enRecursion = (boolean)recursion.devolver(j);

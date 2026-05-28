@@ -1,4 +1,3 @@
-
 package grafo;
 
 import grafo.contenedores.ListaDoubleLinkedL;
@@ -49,5 +48,26 @@ public class GrafoMaterias {
     public int getCapacidad() {
         return materias.tamanio();
     }
+
+    public void mostrarPlanEstudios() {//funcion para mostrar el plan de estudios con sus correlativas
+    int orden = grafo.getOrden();
+    
+    for (int i = 0; i < orden; i++) {
+        for (int j = 0; j < orden; j++) {
+            double valor = (double) grafo.getMatrizCosto().devolver(i, j);
+            
+            if (valor != grafo.getInfinito()) {
+                Materia origen  = getMateria(i);
+                Materia destino = getMateria(j);
+                String etiqueta = valor == 1.0 ? "R" : "A";
+                
+                System.out.println(origen.getNombre() 
+                    + " → " + destino.getNombre() 
+                    + " (" + etiqueta + ")");
+            }
+        }
+    }
+}
+
 }
 

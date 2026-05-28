@@ -47,7 +47,7 @@ public abstract class AbsGrafoD extends AbsGrafo implements OperacionesGD{
 		for (int i=0; i<getOrden();i++){			
 			this.listaSolucion.insertar(-1, i);
 			this.listaCamino.insertar(-1, i);
-			this.listaDistancia.insertar(infinito, i);
+			this.listaDistancia.insertar(getInfinito(), i);
 		}
 		this.listaSolucion.reemplazar(startVertex,startVertex); // el primer vertice del camino
 		
@@ -60,7 +60,7 @@ public abstract class AbsGrafoD extends AbsGrafo implements OperacionesGD{
 				
 		
 		for (int i=1; i<getOrden();i++){
-			minCost=infinito;
+			minCost=getInfinito();
 			minVertex=-1;
 			
 			for (int w=0; w<getOrden();w++){
@@ -103,7 +103,7 @@ public abstract class AbsGrafoD extends AbsGrafo implements OperacionesGD{
 			for (int j=0; j<getOrden();j++){
 				if (i!=j){
 					currCost=(double)this.getMatrizCosto().devolver(i, j);
-					if (currCost!=infinito){
+					if (currCost!=getInfinito()){
 						System.out.println("costo " + i + " a " + j + "->" + currCost);
 					}				
 				}
@@ -147,7 +147,7 @@ public abstract class AbsGrafoD extends AbsGrafo implements OperacionesGD{
 			for(int j=0;j<ordenGrafo;j++){
 				if(i!=j){
 					costoF=(double)matrizCostoF.devolver(i, j);
-					if(costoF!=infinito){System.out.println("Costo m�nimo de "+i+" hasta "+j+": "+costoF);}
+					if(costoF!=getInfinito()){System.out.println("Costo m�nimo de "+i+" hasta "+j+": "+costoF);}
 				}
 				
 				
@@ -160,7 +160,7 @@ public abstract class AbsGrafoD extends AbsGrafo implements OperacionesGD{
 	
 	public void muestraCaminoFloyd(int origen, int destino){
 		double hayCamino = ((Double)this.matrizCostoF.devolver(origen, destino)).doubleValue();
-		if(hayCamino!=infinito) {
+		if(hayCamino!=getInfinito()) {
 			System.out.print("Camino entre "+origen+" y "+destino+": ");
 			System.out.print(origen);
 			buscarCaminoFloyd(origen,destino);
