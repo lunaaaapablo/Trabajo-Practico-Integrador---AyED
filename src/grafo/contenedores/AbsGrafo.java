@@ -5,7 +5,7 @@ import grafo.recursos.OperacionesGrafo;
 public abstract class AbsGrafo implements OperacionesGrafo {
     private MatrizGrafo matrizCosto;
 	protected int ordenGrafo;
-	private static double infinito=10000;
+	protected static double infinito = 10000;
    
 
     public AbsGrafo(int ordenGrafo) {
@@ -14,22 +14,12 @@ public abstract class AbsGrafo implements OperacionesGrafo {
 		for(int i=0;i<getOrden();i++){
 			for(int j=0;j<getOrden();j++){
 
-	            getMatrizCosto().actualizar(getInfinito(),i,j);
+	            getMatrizCosto().actualizar(infinito,i,j);
 	            }
 			}
 		}
 	
-	public static double getInfinito() {
-        return infinito;
-        
-    }
-
-    public static void setInfinito(double infinito) {
-        AbsGrafo.infinito = infinito;
-        
-    }
-
-    public int getOrden(){
+	public int getOrden(){
 		return this.ordenGrafo;
 	}
 	
@@ -45,12 +35,7 @@ public abstract class AbsGrafo implements OperacionesGrafo {
 		for (int w=0;w<getOrden();w++){
 			marcado=(boolean)listaMarca.devolver(w);
 			currCost=(double)this.getMatrizCosto().devolver(v,w);
-<<<<<<< HEAD
-			if (currCost!=getInfinito() && !marcado){//si hay conexion entre el vertice v y el vertice w, y el vertice w no ha sido visitado,
-			                                    // entonces se llama a la funcion bpf para visitar el vertice w y sus adyacentes
-=======
 			if (currCost!=infinito && !marcado){//si hay conexion entre el vertice v y el vertice w, y el vertice w no ha sido visitado, entonces se llama a la funcion bpf para visitar el vertice w y sus adyacentes
->>>>>>> d029b7a (Arreglo de clases)
 				bpf(listaMarca,w);
 			}
 		}
@@ -89,7 +74,7 @@ public abstract class AbsGrafo implements OperacionesGrafo {
 			for (int z=0;z<getOrden();z++){
 				marcado=(boolean)listaMarca.devolver(z);
 				currCost=(double)this.getMatrizCosto().devolver(w,z);
-				if (currCost!=getInfinito() && !marcado){
+				if (currCost!=infinito && !marcado){
 					listaMarca.reemplazar(true, z);
 					cola.meter(z);
 					System.out.println("arista visitada " + w + " - " + z);
@@ -122,5 +107,9 @@ public abstract class AbsGrafo implements OperacionesGrafo {
 
 	public void setMatrizCosto(MatrizGrafo matrizCosto) {
 		this.matrizCosto = matrizCosto;
+	}
+
+	public double getInfinito() {
+		return infinito;
 	}
 }
