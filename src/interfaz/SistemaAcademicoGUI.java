@@ -1,21 +1,19 @@
 package interfaz;
 
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import archivos.Lectura;
 
 import grafo.GrafoMaterias;
 import modelo.*;
+import reglas.Dictamen;
+import reglas.MotorReglas;
 import grafo.contenedores.ListaDoubleLinkedL;
 import grafo.dirigido.*;
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
+
+import archivos.Lectura;
 
 public class SistemaAcademicoGUI extends JFrame {
 
@@ -253,7 +251,6 @@ public class SistemaAcademicoGUI extends JFrame {
                     JOptionPane.WARNING_MESSAGE
             );
             return;}
-        
         String ruta = seleccionarArchivo();
         if (ruta == null) {return;}
         String legajoTexto =
@@ -262,39 +259,25 @@ public class SistemaAcademicoGUI extends JFrame {
                         "Ingrese el legajo del alumno:"
                 );
         if (legajoTexto == null ||legajoTexto.trim().isEmpty()) {return;}
-
         try {
-
-            int legajo =
-                    Integer.parseInt(
-                            legajoTexto
-                    );
-
-            Alumno alumno =
-                    buscarAlumno(legajo);
-
+            int legajo = Integer.parseInt(legajoTexto);
+            Alumno alumno =buscarAlumno(legajo);
             if (alumno == null) {
-
                 JOptionPane.showMessageDialog(
                         this,
                         "Alumno no encontrado.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE
                 );
-
                 return;
             }
-
             lector.cargarHistorial(ruta,alumno,grafoMaterias);
             mostrarMensaje(tablaHistorial,"Historial cargado para " + alumno.getNombre());
-
             JOptionPane.showMessageDialog(
                     this,
                     "Historial cargado correctamente."
             );
-
         } catch (NumberFormatException ex) {
-
             JOptionPane.showMessageDialog(
                     this,
                     "Legajo inválido.",
@@ -304,9 +287,7 @@ public class SistemaAcademicoGUI extends JFrame {
         }
     }
 
-    // ==================================
     // BUSCAR ALUMNO
-    // ==================================
 
     private Alumno buscarAlumno(int legajo) {
         for (int i = 0;i < alumnos.tamanio();i++) {
@@ -322,36 +303,68 @@ public class SistemaAcademicoGUI extends JFrame {
     // ==================================
 
     private void mostrarVentanaSolicitud(ActionEvent e) {
-        JDialog dialogo = new JDialog( this,"Solicitud Académica",true);
-        dialogo.setSize(600, 400);
-        dialogo.setLocationRelativeTo(this);
-        dialogo.setLayout(new BorderLayout());
-        JLabel titulo = new JLabel("Gestión de Solicitud",SwingConstants.CENTER);
-        JTable tablaSolicitud = new JTable();
-        DefaultTableModel modelo = new DefaultTableModel();
-        modelo.addColumn("Información");
-        modelo.addRow(new Object[]{"Funcionalidad pendiente de implementación"});
-        tablaSolicitud.setModel(modelo);
-        JButton btnCerrar = new JButton("Cerrar");
-        btnCerrar.addActionListener(evento -> dialogo.dispose() );
-        dialogo.add(titulo,BorderLayout.NORTH);
-        dialogo.add(new JScrollPane(tablaSolicitud),BorderLayout.CENTER);
-        dialogo.add(btnCerrar,BorderLayout.SOUTH);
-        dialogo.setVisible(true);
+       if (grafoMaterias == null || alumnos == null) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Debe cargar materias y alumnos primero.",
+                "Advertencia",
+                JOptionPane.WARNING_MESSAGE);
+        return;}
+    JDialog dialogo = new JDialog(this,"Solicitud de Cursado Condicional",true);
+    dialogo.setSize(600, 400);
+    dialogo.setLocationRelativeTo(this);
+    dialogo.setLayout(new BorderLayout());
+    // PANEL SUPERIOR
+    JPanel panelDatos = new JPanel(new GridLayout(3, 2, 10, 10));
+    panelDatos.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+    JComboBox<Alumno> comboAlumnos = new JComboBox<>();
+    for (int i = 0;i < alumnos.tamanio(); i++) {comboAlumnos.addItem((Alumno) alumnos.devolver(i));}
+    JTextField txtMateria = new JTextField();
+    panelDatos.add(new JLabel("Alumno:"));
+    panelDatos.add(comboAlumnos);
+    panelDatos.add(new JLabel("ID Materia:"));
+    panelDatos.add(txtMateria);
+    JButton btnAnalizar =new JButton("Analizar Solicitud");
+    panelDatos.add(new JLabel());
+    panelDatos.add(btnAnalizar);
+    dialogo.add(panelDatos,BorderLayout.NORTH);
+    // RESULTADO
+    JTextArea areaResultado = new JTextArea();
+    areaResultado.setEditable(false);
+    areaResultado.setFont(new Font("Monospaced",Font.PLAIN,14));
+    dialogo.add(new JScrollPane(areaResultado),BorderLayout.CENTER);
+    // BOTON ANALIZAR
+    btnAnalizar.addActionListener(ev -> {
+        try {
+            Alumno alumno =(Alumno)comboAlumnos.getSelectedItem();
+            int idMateria =Integer.parseInt( txtMateria.getText().trim());
+            MotorReglas motor = new MotorReglas(grafoMaterias);
+            Dictamen dictamen = motor.analizar(alumno,idMateria);
+            StringBuilder sb = new StringBuilder();
+            sb.append("ALUMNO = " + alumno.getNombre());
+            sb.append("\nRESULTADO = ");
+            sb.append(dictamen.isAprobado()? "APROBADO" : "RECHAZADO");
+            sb.append("\n" + dictamen.getMensaje());
+            areaResultado.setText(sb.toString());
+        } catch (
+                NumberFormatException ex
+        ) {
+
+            JOptionPane.showMessageDialog(
+                    dialogo,
+                    "Ingrese un ID de materia válido.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    });
+    dialogo.setVisible(true);
     }
-
-    // ==================================
     // Testeo
-    // ==================================
-
-    /*public static void main(String[] args) {
-
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-
-            SistemaAcademicoGUI gui =
-                    new SistemaAcademicoGUI();
-
+            SistemaAcademicoGUI gui = new SistemaAcademicoGUI();
             gui.setVisible(true);
         });
-    }*/
+    }
 }

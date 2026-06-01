@@ -1,4 +1,4 @@
-package reglass;
+package reglas;
 //esta clase sirve para representar el resultado del analisis , indicando si aprueba o no y un mensaje explicativo
 public class Dictamen {
     private boolean aprobado;

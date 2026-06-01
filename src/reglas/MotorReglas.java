@@ -1,4 +1,4 @@
-package reglass;
+package reglas;
 
 import grafo.GrafoMaterias;
 import modelo.Alumno;
