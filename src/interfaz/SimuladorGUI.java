@@ -367,24 +367,30 @@ public class SimuladorGUI extends JFrame {
         modelo.addColumn("Nombre");
         modelo.addColumn("Año");
         modelo.addColumn("Regular");
+        modelo.addColumn("Aprobacion");
 
         int orden = grafoMaterias.getGrafo().getOrden();
         for (int i = 0; i < grafoMaterias.getCapacidad(); i++) {
             Materia m = grafoMaterias.getMateria(i);
             StringBuilder reqs = new StringBuilder();
+            StringBuilder aprobs = new StringBuilder();
             for (int w = 0; w < orden; w++) {
                 double valor = (double) grafoMaterias.getGrafo().getMatrizCosto().devolver(w, i);
                 if (valor == 1.0) {
                     if (reqs.length() > 0) reqs.append(", ");
                     reqs.append(grafoMaterias.getMateria(w).getId());
+                } else if (valor == 2.0) {
+                    if (aprobs.length() > 0) aprobs.append(", ");
+                    aprobs.append(grafoMaterias.getMateria(w).getNombre());
                 }
             }
-            modelo.addRow(new Object[]{ m.getId(), m.getNombre(), m.getAnio(), reqs.toString() });
+            modelo.addRow(new Object[]{ m.getId(), m.getNombre(), m.getAnio(), reqs.toString(), aprobs.toString() });
         }
 
         tablaMaterias.setModel(modelo);
         colorearColumnaAnio(tablaMaterias, 2);
         centrarColumna(tablaMaterias, 3);
+        centrarColumna(tablaMaterias, 4);
         lblContMaterias.setText(grafoMaterias.getCapacidad() + " materias cargadas");
         setStatus("Correlativas cargadas correctamente");
     }
