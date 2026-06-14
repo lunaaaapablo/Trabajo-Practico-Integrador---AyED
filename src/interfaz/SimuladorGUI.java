@@ -10,6 +10,8 @@ import modelo.Alumno;
 import modelo.EstadoAcademico;
 import modelo.Materia;
 import modelo.SimuladorAcademico;
+import reglas.MotorReglas;
+import reglas.Dictamen;
 
 public class SimuladorGUI extends JFrame {
 
@@ -72,12 +74,14 @@ public class SimuladorGUI extends JFrame {
         JButton btnCorrelativas = crearBoton("Cargar Correlativas");
         JButton btnAlumnos = crearBoton("Cargar Alumnos");
         JButton btnEstado = crearBoton("Cargar Estado Academico");
+        JButton btnSolicitud = crearBoton("Cargar Solicitud");
         JButton btnSimulador = crearBoton("Abrir Simulador");
 
         btnMaterias.addActionListener(e -> cargarMaterias());
         btnCorrelativas.addActionListener(e -> cargarCorrelativas());
         btnAlumnos.addActionListener(e -> cargarAlumnos());
         btnEstado.addActionListener(e -> cargarHistorial());
+        btnSolicitud.addActionListener(e -> mostrarVentanaSolicitud());
         btnSimulador.addActionListener(e -> abrirSimulador());
 
         toolbar.add(btnMaterias);
@@ -85,6 +89,7 @@ public class SimuladorGUI extends JFrame {
         toolbar.add(btnAlumnos);
         toolbar.add(btnEstado);
         toolbar.add(Box.createHorizontalStrut(20));
+        toolbar.add(btnSolicitud);
         toolbar.add(btnSimulador);
 
         panelEncabezado.add(titulo, BorderLayout.NORTH);
@@ -307,6 +312,61 @@ public class SimuladorGUI extends JFrame {
         setStatus("Historial cargado - " + alumno.getNombre());
     }
 
+    private void mostrarVentanaSolicitud() {
+        if (grafoMaterias == null || alumnos == null) {
+            JOptionPane.showMessageDialog(this, "Debe cargar materias y alumnos primero", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        JDialog dialogo = new JDialog(this, "Solicitud de Cursado Condicional", false);
+        dialogo.setSize(550, 420);
+        dialogo.setLocationRelativeTo(this);
+        dialogo.setLayout(new BorderLayout());
+
+        JPanel panelDatos = new JPanel(new GridLayout(3, 2, 10, 10));
+        panelDatos.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        JComboBox<Alumno> comboAlumnos = new JComboBox<>();
+        for (int i = 0; i < alumnos.tamanio(); i++) {
+            comboAlumnos.addItem((Alumno) alumnos.devolver(i));
+        }
+        JTextField txtMateria = new JTextField();
+
+        panelDatos.add(new JLabel("Alumno:"));
+        panelDatos.add(comboAlumnos);
+        panelDatos.add(new JLabel("ID Materia:"));
+        panelDatos.add(txtMateria);
+
+        JButton btnAnalizar = new JButton("Analizar Solicitud");
+        panelDatos.add(new JLabel());
+        panelDatos.add(btnAnalizar);
+        dialogo.add(panelDatos, BorderLayout.NORTH);
+
+        JTextArea areaResultado = new JTextArea();
+        areaResultado.setEditable(false);
+        areaResultado.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        dialogo.add(new JScrollPane(areaResultado), BorderLayout.CENTER);
+
+        btnAnalizar.addActionListener(ev -> {
+            try {
+                Alumno alumno = (Alumno) comboAlumnos.getSelectedItem();
+                int idMateria = Integer.parseInt(txtMateria.getText().trim());
+                MotorReglas motor = new MotorReglas(grafoMaterias);
+                Dictamen dictamen = motor.analizar(alumno, idMateria);
+                StringBuilder sb = new StringBuilder();
+                sb.append("ALUMNO = ").append(alumno.getNombre());
+                sb.append("\nRESULTADO = ");
+                sb.append(dictamen.isAprobado() ? "APROBADO" : "RECHAZADO");
+                sb.append("\n").append(dictamen.getMensaje());
+                areaResultado.setText(sb.toString());
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialogo, "Ingrese un ID de materia valido.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        dialogo.setVisible(true);
+    }
+
     private void abrirSimulador() {
         if (grafoMaterias == null || alumnoSeleccionado == null) {
             JOptionPane.showMessageDialog(this, "Debe cargar materias y estado academico primero", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -316,7 +376,7 @@ public class SimuladorGUI extends JFrame {
         SimuladorAcademico sim = new SimuladorAcademico(grafoMaterias);
         sim.cargarDesde(alumnoSeleccionado);
 
-        JDialog dialog = new JDialog(this, "Simulador - Explore caminos", true);
+        JDialog dialog = new JDialog(this, "Simulador - Explore caminos", false);
         dialog.setSize(600, 500);
         dialog.setLocationRelativeTo(this);
 
