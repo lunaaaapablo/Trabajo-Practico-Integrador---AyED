@@ -37,12 +37,10 @@ public class SimuladorAcademico {
     public void ciclarEstado(int indice) {
         EstadoAcademico actual = estados[indice];
         switch (actual) {
-            case NO_CURSADA -> estados[indice] = EstadoAcademico.CURSANDO;
-            case CURSANDO -> estados[indice] = EstadoAcademico.REGULAR;
+            case LIBRE -> estados[indice] = EstadoAcademico.REGULAR;
             case REGULAR -> estados[indice] = EstadoAcademico.APROBADA;
             case APROBADA -> estados[indice] = EstadoAcademico.LIBRE;
-            case LIBRE -> estados[indice] = EstadoAcademico.DESAPROBADA;
-            case DESAPROBADA -> estados[indice] = EstadoAcademico.NO_CURSADA;
+            default -> estados[indice] = EstadoAcademico.LIBRE;
         }
     }
 

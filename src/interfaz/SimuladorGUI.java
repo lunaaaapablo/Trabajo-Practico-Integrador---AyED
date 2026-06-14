@@ -73,7 +73,7 @@ public class SimuladorGUI extends JFrame {
         JButton btnMaterias = crearBoton("Cargar Materias");
         JButton btnCorrelativas = crearBoton("Cargar Correlativas");
         JButton btnAlumnos = crearBoton("Cargar Alumnos");
-        JButton btnEstado = crearBoton("Cargar Estado Academico");
+        JButton btnEstado = crearBoton("Cargar Historial Academico");
         JButton btnSolicitud = crearBoton("Cargar Solicitud");
         JButton btnSimulador = crearBoton("Abrir Simulador");
 
@@ -141,7 +141,7 @@ public class SimuladorGUI extends JFrame {
 
         panel.add(crearPanelTabla("MATERIAS", tablaMaterias, lblContMaterias));
         panel.add(crearPanelTabla("ALUMNOS", tablaAlumnos, lblContAlumnos));
-        panel.add(crearPanelTabla("ESTADO ACADEMICO", tablaHistorial, lblContHistorial));
+        panel.add(crearPanelTabla("HISTORIAL ACADEMICO", tablaHistorial, lblContHistorial));
         panel.add(panelVacio);
 
         return panel;
@@ -284,7 +284,7 @@ public class SimuladorGUI extends JFrame {
             arr[i] = (Alumno) alumnos.devolver(i);
 
         Alumno alumno = (Alumno) JOptionPane.showInputDialog(
-            this, "Seleccione el alumno:", "Cargar Estado Academico",
+            this, "Seleccione el alumno:", "Cargar Historial Academico",
             JOptionPane.PLAIN_MESSAGE, null, arr, arr[0]);
         if (alumno == null) return;
 
