@@ -3,6 +3,8 @@ package interfaz;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.image.BufferedImage;
 import archivos.Lectura;
 import grafo.GrafoMaterias;
 import grafo.contenedores.ListaDoubleLinkedL;
@@ -73,21 +75,18 @@ public class SimuladorGUI extends JFrame {
         JButton btnMaterias = crearBoton("Cargar Materias");
         JButton btnCorrelativas = crearBoton("Cargar Correlativas");
         JButton btnAlumnos = crearBoton("Cargar Alumnos");
-        JButton btnEstado = crearBoton("Cargar Historial Academico");
         JButton btnSolicitud = crearBoton("Cargar Solicitud");
         JButton btnSimulador = crearBoton("Abrir Simulador");
 
         btnMaterias.addActionListener(e -> cargarMaterias());
         btnCorrelativas.addActionListener(e -> cargarCorrelativas());
         btnAlumnos.addActionListener(e -> cargarAlumnos());
-        btnEstado.addActionListener(e -> cargarHistorial());
         btnSolicitud.addActionListener(e -> mostrarVentanaSolicitud());
         btnSimulador.addActionListener(e -> abrirSimulador());
 
         toolbar.add(btnMaterias);
         toolbar.add(btnCorrelativas);
         toolbar.add(btnAlumnos);
-        toolbar.add(btnEstado);
         toolbar.add(Box.createHorizontalStrut(20));
         toolbar.add(btnSolicitud);
         toolbar.add(btnSimulador);
@@ -108,7 +107,61 @@ public class SimuladorGUI extends JFrame {
         ));
         boton.setFocusPainted(false);
         boton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        boton.setIcon(iconoBoton(texto));
+        boton.setHorizontalTextPosition(SwingConstants.RIGHT);
+        boton.setIconTextGap(6);
         return boton;
+    }
+
+    private ImageIcon iconoBoton(String texto) {
+        int s = 16;
+        BufferedImage img = new BufferedImage(s, s, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = img.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(AZUL_MEDIO);
+        g2.setStroke(new BasicStroke(1.5f));
+
+        switch (texto) {
+            case "Cargar Materias":
+                g2.fillRect(3, 4, 10, 2);
+                g2.fillRect(3, 8, 10, 2);
+                g2.fillRect(3, 12, 7, 2);
+                break;
+            case "Cargar Correlativas":
+                g2.drawOval(2, 2, 5, 5);
+                g2.drawOval(9, 2, 5, 5);
+                g2.drawOval(5, 9, 5, 5);
+                g2.drawLine(7, 5, 9, 4);
+                g2.drawLine(7, 7, 9, 8);
+                g2.drawLine(4, 7, 5, 9);
+                g2.drawLine(11, 7, 10, 9);
+                break;
+            case "Cargar Alumnos":
+                g2.drawOval(5, 2, 6, 5);
+                g2.drawArc(3, 8, 10, 7, 0, -180);
+                break;
+            case "Cargar Historial Academico":
+                g2.drawRoundRect(3, 2, 10, 12, 2, 2);
+                g2.fillRect(5, 5, 6, 1);
+                g2.fillRect(5, 8, 6, 1);
+                g2.fillRect(5, 11, 4, 1);
+                break;
+            case "Cargar Solicitud":
+                g2.drawRect(4, 2, 9, 12);
+                g2.drawLine(4, 2, 8, 5);
+                g2.drawLine(8, 5, 13, 2);
+                g2.fillRect(6, 7, 5, 1);
+                g2.fillRect(6, 10, 5, 1);
+                break;
+            case "Abrir Simulador":
+                g2.drawOval(1, 1, 14, 14);
+                int[] xs = {6, 6, 12};
+                int[] ys = {4, 12, 8};
+                g2.fillPolygon(xs, ys, 3);
+                break;
+        }
+        g2.dispose();
+        return new ImageIcon(img);
     }
 
     private JPanel crearPanelCentral() {
@@ -347,6 +400,12 @@ public class SimuladorGUI extends JFrame {
         areaResultado.setFont(new Font("Monospaced", Font.PLAIN, 14));
         dialogo.add(new JScrollPane(areaResultado), BorderLayout.CENTER);
 
+        comboAlumnos.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                cargarHistorialSolicitud((Alumno) comboAlumnos.getSelectedItem(), dialogo);
+            }
+        });
+
         btnAnalizar.addActionListener(ev -> {
             try {
                 Alumno alumno = (Alumno) comboAlumnos.getSelectedItem();
@@ -364,7 +423,37 @@ public class SimuladorGUI extends JFrame {
             }
         });
 
+        dialogo.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                if (comboAlumnos.getItemCount() > 0)
+                    cargarHistorialSolicitud(comboAlumnos.getItemAt(0), dialogo);
+            }
+        });
         dialogo.setVisible(true);
+    }
+
+    private void cargarHistorialSolicitud(Alumno alumno, JDialog padre) {
+        if (alumno == null) return;
+        FileDialog fd = new FileDialog(padre, "Historial de " + alumno.getNombre(), FileDialog.LOAD);
+        fd.setFilenameFilter((dir, name) -> name.endsWith(".txt"));
+        fd.setVisible(true);
+        if (fd.getFile() == null) return;
+        String ruta = new java.io.File(fd.getDirectory(), fd.getFile()).getAbsolutePath();
+        Lectura lectura = new Lectura();
+        lectura.cargarHistorial(ruta, alumno, grafoMaterias);
+        alumnoSeleccionado = alumno;
+
+        DefaultTableModel modelo = new DefaultTableModel(
+            new Object[]{"Materia", "Estado"}, 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+        for (int i = 0; i < grafoMaterias.getCapacidad(); i++) {
+            Materia m = grafoMaterias.getMateria(i);
+            modelo.addRow(new Object[]{ m.getNombre(), estadoTexto(alumno.getEstado(i)) });
+        }
+        tablaHistorial.setModel(modelo);
+        colorearColumnaEstado(tablaHistorial, 1);
+        lblContHistorial.setText("Historial: " + alumno.getNombre());
     }
 
     private void abrirSimulador() {
