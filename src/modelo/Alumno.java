@@ -29,7 +29,7 @@ public class Alumno {//un alumno tiene un legajo, un nombre y un arreglo de esta
     public EstadoAcademico getEstado(int indice) {
         return estadoMaterias[indice];
     }
-
+    
     @Override
     public String toString() {
         return legajo + " - " + nombre;

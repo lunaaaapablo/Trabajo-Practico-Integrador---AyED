@@ -37,6 +37,18 @@ public class MotorReglas {
             return new Dictamen(false, regla3.getMensaje());
         }
 
+        // Regla 4: minimo de materias aprobadas de años anteriores
+        ReglaMateriasMinimas regla4 = new ReglaMateriasMinimas(grafoMaterias);
+        if (!regla4.cumple(alumno, indiceMateria)) {
+            return new Dictamen(false, regla4.getMensaje());
+        }
+
+        // Regla 5: materias troncales regularizadas
+        ReglaMateriasTroncales regla5 = new ReglaMateriasTroncales(grafoMaterias);
+        if (!regla5.cumple(alumno, indiceMateria)) {
+            return new Dictamen(false, regla5.getMensaje());
+        }
+
         return new Dictamen(true, "Condicional APROBADO");
     }
 }
