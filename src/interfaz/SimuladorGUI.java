@@ -421,45 +421,6 @@ public class SimuladorGUI extends JFrame {
         setStatus("Alumnos cargados correctamente - " + alumnos.tamanio() + " alumnos");
     }
 
-    private void cargarHistorial() {
-        if (grafoMaterias == null || alumnos == null) {
-            JOptionPane.showMessageDialog(this, "Debe cargar materias y alumnos primero", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        Alumno[] arr = new Alumno[alumnos.tamanio()];
-        for (int i = 0; i < alumnos.tamanio(); i++)
-            arr[i] = (Alumno) alumnos.devolver(i);
-
-        Alumno alumno = (Alumno) JOptionPane.showInputDialog(
-            this, "Seleccione el alumno:", "Cargar Historial Academico",
-            JOptionPane.PLAIN_MESSAGE, null, arr, arr[0]);
-        if (alumno == null) return;
-
-        FileDialog fd = new FileDialog(this, "Seleccionar archivo de historial", FileDialog.LOAD);
-        fd.setFilenameFilter((dir, name) -> name.endsWith(".txt"));
-        fd.setVisible(true);
-        if (fd.getFile() == null) return;
-
-        String ruta = new java.io.File(fd.getDirectory(), fd.getFile()).getAbsolutePath();
-        Lectura lectura = new Lectura();
-        lectura.cargarHistorial(ruta, alumno, grafoMaterias);
-        alumnoSeleccionado = alumno;
-
-        DefaultTableModel modelo = new DefaultTableModel(
-            new Object[]{"Materia", "Estado"}, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
-        };
-        for (int i = 0; i < grafoMaterias.getCapacidad(); i++) {
-            Materia m = grafoMaterias.getMateria(i);
-            modelo.addRow(new Object[]{ m.getNombre(), estadoTexto(alumno.getEstado(i)) });
-        }
-        tablaHistorial.setModel(modelo);
-        colorearColumnaEstado(tablaHistorial, 1);
-        lblContHistorial.setText("Historial: " + alumno.getNombre());
-        setStatus("Historial cargado - " + alumno.getNombre());
-    }
-
     private void mostrarVentanaSolicitud() {
         if (grafoMaterias == null || alumnos == null) {
             JOptionPane.showMessageDialog(this, "Debe cargar materias y alumnos primero", "Advertencia", JOptionPane.WARNING_MESSAGE);
