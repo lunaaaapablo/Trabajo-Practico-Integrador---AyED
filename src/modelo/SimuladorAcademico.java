@@ -48,9 +48,18 @@ public class SimuladorAcademico {
 
     public boolean puedeCursarRegular(int indiceMateria) {
         int orden = grafoMaterias.getGrafo().getOrden();
+        boolean[] visitado = new boolean[orden];
+        return bpf(indiceMateria, visitado);
+    }
+
+    private boolean bpf(int v, boolean[] visitado) {
+        visitado[v] = true;
+        int orden = grafoMaterias.getGrafo().getOrden();
+        double inf = grafoMaterias.getGrafo().getInfinito();
+
         for (int w = 0; w < orden; w++) {
-            double valor = (double) grafoMaterias.getGrafo().getMatrizCosto().devolver(w, indiceMateria);
-            if (valor != grafoMaterias.getGrafo().getInfinito()) {
+            double valor = (double) grafoMaterias.getGrafo().getMatrizCosto().devolver(w, v);
+            if (valor != inf && !visitado[w]) {
                 if (valor == 1.0) {
                     if (estados[w] != EstadoAcademico.REGULAR && estados[w] != EstadoAcademico.APROBADA) {
                         return false;
@@ -59,6 +68,9 @@ public class SimuladorAcademico {
                     if (estados[w] != EstadoAcademico.APROBADA) {
                         return false;
                     }
+                }
+                if (!bpf(w, visitado)) {
+                    return false;
                 }
             }
         }
