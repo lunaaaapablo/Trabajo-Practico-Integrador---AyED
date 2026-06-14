@@ -316,7 +316,57 @@ public class SimuladorGUI extends JFrame {
         SimuladorAcademico sim = new SimuladorAcademico(grafoMaterias);
         sim.cargarDesde(alumnoSeleccionado);
 
-        SimuladorDialog dialog = new SimuladorDialog(this, sim, grafoMaterias);
+        JDialog dialog = new JDialog(this, "Simulador - Explore caminos", true);
+        dialog.setSize(600, 500);
+        dialog.setLocationRelativeTo(this);
+
+        JLabel instruccion = new JLabel("  Haga clic en una materia para cambiar su estado");
+        instruccion.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        instruccion.setBorder(BorderFactory.createEmptyBorder(8, 8, 4, 8));
+
+        DefaultTableModel modeloSim = new DefaultTableModel(new Object[]{"Materia", "Estado", "Acceso"}, 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+        JTable tablaSim = new JTable(modeloSim);
+        tablaSim.setRowHeight(28);
+
+        Runnable actualizarTabla = () -> {
+            modeloSim.setRowCount(0);
+            for (int i = 0; i < grafoMaterias.getCapacidad(); i++) {
+                Materia m = grafoMaterias.getMateria(i);
+                EstadoAcademico est = sim.getEstado(i);
+                boolean disponible = sim.puedeCursarRegular(i);
+                modeloSim.addRow(new Object[]{ m.getNombre(), estadoTexto(est), disponible ? "Si" : "No" });
+            }
+            tablaSim.getColumnModel().getColumn(2).setCellRenderer(
+                new javax.swing.table.DefaultTableCellRenderer() {
+                    public Component getTableCellRendererComponent(JTable t, Object v,
+                        boolean sel, boolean foc, int r, int c) {
+                        super.getTableCellRendererComponent(t, v, sel, foc, r, c);
+                        setHorizontalAlignment(CENTER);
+                        boolean disp = sim.puedeCursarRegular(r);
+                        if (disp) { setBackground(VERDE_CLARO); setForeground(new Color(59, 109, 17)); }
+                        else      { setBackground(ROJO_CLARO);  setForeground(new Color(163, 45, 45)); }
+                        setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                        return this;
+                    }
+                }
+            );
+        };
+
+        tablaSim.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = tablaSim.rowAtPoint(e.getPoint());
+                if (row >= 0) {
+                    sim.ciclarEstado(row);
+                    actualizarTabla.run();
+                }
+            }
+        });
+
+        actualizarTabla.run();
+        dialog.add(instruccion, BorderLayout.NORTH);
+        dialog.add(new JScrollPane(tablaSim), BorderLayout.CENTER);
         dialog.setVisible(true);
     }
 
