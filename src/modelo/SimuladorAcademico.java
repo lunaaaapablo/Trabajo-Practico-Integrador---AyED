@@ -4,9 +4,11 @@ import grafo.GrafoMaterias;
 
 public class SimuladorAcademico {
 
+    //Atributos
     private GrafoMaterias grafoMaterias;
     private EstadoAcademico[] estados;
 
+    //Constructor
     public SimuladorAcademico(GrafoMaterias grafoMaterias) {
         this.grafoMaterias = grafoMaterias;
         int cant = grafoMaterias.getCapacidad();
@@ -34,6 +36,7 @@ public class SimuladorAcademico {
         estados[indice] = estado;
     }
 
+    //Cicla el estado de la materia: Para poder realizar la simulacion de camino posibles, ciclando el estado en libre,regular o aprobada
     public void ciclarEstado(int indice) {
         EstadoAcademico actual = estados[indice];
         switch (actual) {
@@ -44,12 +47,14 @@ public class SimuladorAcademico {
         }
     }
 
+    //Verifica si el alumno puede cursar la materia cumpliendo las correlatividades, sirve tambien para el camino posible
     public boolean puedeCursarRegular(int indiceMateria) {
         int orden = grafoMaterias.getGrafo().getOrden();
         boolean[] visitado = new boolean[orden];
         return bpf(indiceMateria, visitado);
     }
 
+    //buscqueda en profundidad en el grafo de materias para verificar las correlatividades
     private boolean bpf(int v, boolean[] visitado) {
         visitado[v] = true;
         int orden = grafoMaterias.getGrafo().getOrden();
